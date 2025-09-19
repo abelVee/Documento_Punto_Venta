@@ -4,12 +4,12 @@ CREATE TABLE state (
     state_description TEXT
 );
 
-CREATE TABLE product_category (
+CREATE TABLE productCategory (
     product_category_id SERIAL PRIMARY KEY,
     category_name VARCHAR
 );
 
-CREATE TABLE unit_measure (
+CREATE TABLE unitMeasure (
     unit_measure_id SERIAL PRIMARY KEY,
     unit_name VARCHAR
 );
@@ -21,8 +21,8 @@ CREATE TABLE product (
     unit_measure_id INTEGER,
     package_size DECIMAL(10,2) CHECK(package_size >= 0),
     unit_price DECIMAL(10,2) CHECK(unit_price >= 0),
-    FOREIGN KEY (product_category_id) REFERENCES product_category(product_category_id),
-    FOREIGN KEY (unit_measure_id) REFERENCES unit_measure(unit_measure_id)
+    FOREIGN KEY (product_category_id) REFERENCES productCategory(product_category_id),
+    FOREIGN KEY (unit_measure_id) REFERENCES unitMeasure(unit_measure_id)
 );
 
 CREATE TABLE inventory (
@@ -35,12 +35,12 @@ CREATE TABLE inventory (
     FOREIGN KEY (product_id) REFERENCES product(product_id)
 );
 
-CREATE TABLE payment_method (
+CREATE TABLE paymentMethod (
     payment_method_id SMALLINT PRIMARY KEY,
     method_type VARCHAR
 );
 
-CREATE TABLE user_account (
+CREATE TABLE userAccount (
     user_account_id SERIAL PRIMARY KEY,
     user_name VARCHAR,
     user_last_name VARCHAR,
@@ -67,12 +67,12 @@ CREATE TABLE purchase (
     total_payment DECIMAL(10,2) CHECK(total_payment >= 0),
     payment_method_id SMALLINT,
     purchase_date DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (user_account_id) REFERENCES user_account(user_account_id),
+    FOREIGN KEY (user_account_id) REFERENCES userAccount(user_account_id),
     FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id),
-    FOREIGN KEY (payment_method_id) REFERENCES payment_method(payment_method_id)
+    FOREIGN KEY (payment_method_id) REFERENCES paymentMethod(payment_method_id)
 );
 
-CREATE TABLE purchase_detail (
+CREATE TABLE purchaseDetail (
     purchase_id INTEGER,
     consecutive SMALLINT,
     product_id INTEGER,
@@ -102,27 +102,27 @@ CREATE TABLE profile (
     profile_description TEXT
 );
 
-CREATE TABLE profile_detail (
+CREATE TABLE profileDetail (
     user_account_id INTEGER,
     consecutive SMALLINT,
     module_id INTEGER,
     profile_id INTEGER,
     permission_id INTEGER,
     PRIMARY KEY (user_account_id, consecutive),
-    FOREIGN KEY (user_account_id) REFERENCES user_account(user_account_id),
+    FOREIGN KEY (user_account_id) REFERENCES userAccount(user_account_id),
     FOREIGN KEY (module_id) REFERENCES module(module_id),
     FOREIGN KEY (profile_id) REFERENCES profile(profile_id),
     FOREIGN KEY (permission_id) REFERENCES permission(permission_id)
 );
 
-CREATE TABLE user_detail (
+CREATE TABLE userDetail (
     user_account_id INTEGER,
     consecutive SMALLINT,
     profile_id INTEGER,
     start_date DATE DEFAULT CURRENT_DATE,
     end_date DATE,
     PRIMARY KEY (user_account_id, consecutive),
-    FOREIGN KEY (user_account_id) REFERENCES user_account(user_account_id),
+    FOREIGN KEY (user_account_id) REFERENCES userAccount(user_account_id),
     FOREIGN KEY (profile_id) REFERENCES profile(profile_id)
 );
 
@@ -132,11 +132,11 @@ CREATE TABLE sale (
     payment_method_id SMALLINT,
     sale_date DATE DEFAULT CURRENT_DATE,
     total_payment DECIMAL(10,2) CHECK(total_payment >= 0),
-    FOREIGN KEY (user_account_id) REFERENCES user_account(user_account_id),
-    FOREIGN KEY (payment_method_id) REFERENCES payment_method(payment_method_id)
+    FOREIGN KEY (user_account_id) REFERENCES userAccount(user_account_id),
+    FOREIGN KEY (payment_method_id) REFERENCES paymentMethod(payment_method_id)
 );
 
-CREATE TABLE sale_detail (
+CREATE TABLE saleDetail (
     sale_id INTEGER,
     consecutive SMALLINT,
     product_id INTEGER,
@@ -147,6 +147,7 @@ CREATE TABLE sale_detail (
     FOREIGN KEY (sale_id) REFERENCES sale(sale_id),
     FOREIGN KEY (product_id) REFERENCES product(product_id)
 );
+
 
 -- Estados ya definidos
 INSERT INTO state (state_id, state_type, state_description) VALUES
@@ -161,14 +162,14 @@ INSERT INTO state (state_id, state_type, state_description) VALUES
 (9, 'agotado', 'Productos agotados');
 
 -- Categorías de producto
-INSERT INTO product_category (category_name) VALUES
+INSERT INTO productCategory (category_name) VALUES
 ('Bebidas'),
 ('Alimentos'),
 ('Higiene'),
 ('Limpieza');
 
 -- Unidades de medida
-INSERT INTO unit_measure (unit_name) VALUES
+INSERT INTO unitMeasure (unit_name) VALUES
 ('litro'),
 ('kilogramo'),
 ('unidad'),
@@ -191,14 +192,14 @@ INSERT INTO inventory (product_id, quantity, unit_price, total_in_stock, total_s
 (5, 30, 35.0, 1050.0, 200.0);
 
 -- Métodos de pago
-INSERT INTO payment_method (payment_method_id, method_type) VALUES
+INSERT INTO paymentMethod (payment_method_id, method_type) VALUES
 (1, 'Efectivo'),
 (2, 'Tarjeta de crédito'),
 (3, 'Transferencia'),
 (4, 'PayPal');
 
 -- Usuarios
-INSERT INTO user_account (user_name, user_last_name, user_second_last_name, email, password, state_id) VALUES
+INSERT INTO userAccount (user_name, user_last_name, user_second_last_name, email, password, state_id) VALUES
 ('Juan', 'Pérez', 'Gómez', 'juanp@mail.com', '12345', 1),
 ('Ana', 'López', 'Martínez', 'anal@mail.com', '12345', 1),
 ('Carlos', 'Sánchez', 'Ramírez', 'carlos@mail.com', '12345', 2);
@@ -214,7 +215,7 @@ INSERT INTO purchase (user_account_id, supplier_id, total_payment, payment_metho
 (2, 2, 350.0, 2);
 
 -- Detalle de compras
-INSERT INTO purchase_detail (purchase_id, consecutive, product_id, quantity, unit_price, total_price) VALUES
+INSERT INTO purchaseDetail (purchase_id, consecutive, product_id, quantity, unit_price, total_price) VALUES
 (1, 1, 1, 10, 20.0, 200.0),
 (1, 2, 3, 20, 15.0, 300.0),
 (2, 1, 2, 10, 19.0, 190.0),
@@ -240,14 +241,14 @@ INSERT INTO profile (profile_id, profile_type, profile_description) VALUES
 (2, 'Vendedor', 'Perfil con permisos limitados a ventas');
 
 -- Detalle de perfil
-INSERT INTO profile_detail (user_account_id, consecutive, module_id, profile_id, permission_id) VALUES
+INSERT INTO profileDetail (user_account_id, consecutive, module_id, profile_id, permission_id) VALUES
 (1, 1, 1, 1, 1),
 (1, 2, 2, 1, 2),
 (2, 1, 1, 2, 1),
 (2, 2, 3, 2, 1);
 
 -- Detalle de usuario
-INSERT INTO user_detail (user_account_id, consecutive, profile_id, start_date, end_date) VALUES
+INSERT INTO userDetail (user_account_id, consecutive, profile_id, start_date, end_date) VALUES
 (1, 1, 1, CURRENT_DATE, NULL),
 (2, 1, 2, CURRENT_DATE, NULL);
 
@@ -257,7 +258,7 @@ INSERT INTO sale (user_account_id, payment_method_id, total_payment) VALUES
 (2, 2, 80.0);
 
 -- Detalle de ventas
-INSERT INTO sale_detail (sale_id, consecutive, product_id, quantity, unit_price, total_price) VALUES
+INSERT INTO saleDetail (sale_id, consecutive, product_id, quantity, unit_price, total_price) VALUES
 (1, 1, 1, 3, 20.0, 60.0),
 (1, 2, 3, 4, 15.0, 60.0),
 (2, 1, 2, 4, 19.0, 76.0);
